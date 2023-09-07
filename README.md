@@ -100,3 +100,68 @@ instance.interceptors.response.use(
   }
 );
 ```
+
+### 방향키 이벤트
+
+1. ul 리스트의 li 노드를 모두 선택한 다음 event.key가 "ArrowDown"이면 index+1 state와 일치하는 노드에 "selected" 클래스를 추가한다. index의 "selected" 클래스는 제거한다.
+2. event.key가 "ArrowUp"이면 index-1 state와 일치하는 노드에 "selected" class를 추가한다. index의 "selected" 클래스는 제거한다.
+3. 데이터를 요청해서 ul 리스트가 변경되면 모든 "selected" 클래스를 제거하여 초기화한다.
+
+```js
+const inputRef = useRef();
+const listRef = useRef();
+const [index, setIndex] = useState(-1);
+
+const keyDownScrollIndex = (e) => {
+const listNode = listRef.current;
+const itemNode = listNode?.querySelectorAll("ul > li");
+if (e.key === "ArrowDown") {
+  e.preventDefault();
+  setIndex((prev) => (prev < itemNode?.length - 1 ? prev + 1 : prev));
+  itemNode && itemNode[index - 1]?.classList.remove("selected");
+  itemNode && itemNode[index]?.classList.add("selected");
+} else if (e.key === "ArrowUp") {
+  e.preventDefault();
+  setIndex((prev) => (prev > 1 ? prev - 1 : prev));
+  itemNode && itemNode[index]?.classList.remove("selected");
+  itemNode && itemNode[index - 1]?.classList.add("selected");
+} else {
+  inputRef.current.focus();
+}
+};
+
+useEffect(() => {
+  getSickData(query)
+    .then(async (result) => {
+      setIndex(-1);
+      const listNode = listRef.current;
+      const itemNode = listNode?.getElementsByClassName("selected");
+      itemNode &&
+        Array.from(itemNode).forEach((element) => {
+          element.classList.remove("selected");
+        });
+    })
+    .catch((err) => {/*생략*/});
+  }, [searchWord]);
+
+return (
+  <SearchInputWrapper>
+    <Icon size="25px" />
+    <SearchWordInput
+      onKeyDown={keyDownScrollIndex}
+      ref={inputRef}
+      value={searchWord}
+      onChange={changeSearchWord}
+      placeholder="질환명을 입력해주세요"
+    />
+  </SearchInputWrapper>
+
+    (searchResult.length !== 0 ? (
+          <SearchResultContainer ref={listRef}>
+          {/* 생략 */}
+          </SearchResultContainer>
+        ) : (
+          <SearchResultContainer>검색어 없음</SearchResultContainer>)
+    );
+)
+```
