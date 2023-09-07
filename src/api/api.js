@@ -24,7 +24,7 @@ const getSickData = param => {
           reject(error);
         }
       }
-    }, 300);
+    }, 200);
   });
 };
 
