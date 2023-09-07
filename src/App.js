@@ -6,22 +6,22 @@ import "./App.css";
 
 function App() {
   const inputRef = useRef();
-  const listRef = useRef(null);
+  const listRef = useRef();
   const [index, setIndex] = useState(-1);
 
-  const scrollToIndex = (e) => {
+  const keyDownScrollIndex = (e) => {
     const listNode = listRef.current;
     const itemNode = listNode?.querySelectorAll("ul > li");
     if (e.key === "ArrowDown") {
       e.preventDefault();
+      setIndex((prev) => (prev < itemNode?.length - 1 ? prev + 1 : prev));
       itemNode && itemNode[index - 1]?.classList.remove("selected");
       itemNode && itemNode[index]?.classList.add("selected");
-      setIndex((prev) => (prev < itemNode?.length - 1 ? prev + 1 : prev));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
+      setIndex((prev) => (prev > 1 ? prev - 1 : prev));
       itemNode && itemNode[index]?.classList.remove("selected");
       itemNode && itemNode[index - 1]?.classList.add("selected");
-      setIndex((prev) => (prev > 0 ? prev - 1 : prev));
     } else {
       inputRef.current.focus();
     }
@@ -31,16 +31,18 @@ function App() {
   const [searchResult, setSearchResult] = useState([]);
 
   useEffect(() => {
-    getSickData(searchWord.trim())
+    const query = searchWord.trim();
+    if (!query) return;
+    getSickData(query)
       .then(async (result) => {
         setSearchResult(result);
         setIndex(-1);
         const listNode = listRef.current;
         const itemNode = listNode?.getElementsByClassName("selected");
-        Array.from(itemNode).forEach((element) => {
-          element.classList.remove("selected");
-        });
-        console.log(itemNode, listRef.current);
+        itemNode &&
+          Array.from(itemNode).forEach((element) => {
+            element.classList.remove("selected");
+          });
       })
       .catch((err) => {
         console.log(err);
@@ -58,7 +60,7 @@ function App() {
       <SearchInputWrapper>
         <Icon size="25px" />
         <SearchWordInput
-          onKeyUp={scrollToIndex}
+          onKeyDown={keyDownScrollIndex}
           ref={inputRef}
           value={searchWord}
           onChange={changeSearchWord}

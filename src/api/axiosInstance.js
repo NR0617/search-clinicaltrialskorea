@@ -18,7 +18,8 @@ instance.interceptors.request.use(
       const cacheStorage = await caches.open("search");
       await cacheStorage.delete(config.url);
     }
-    console.log("api call");
+    // 요구사항: API를 호출할 때 마다 `console.info("calling api")` 출력을 통해 콘솔창에서 API 호출 횟수 확인이 가능하도록 설정
+    console.info("calling api");
     return config;
   },
   function (error) {

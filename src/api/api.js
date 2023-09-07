@@ -4,15 +4,14 @@ const GETSICK = "/sick?q=";
 
 let timer;
 
-const getSickData = (param = "") => {
+const getSickData = (param) => {
   if (timer) {
     clearTimeout(timer);
   }
-
   return new Promise((resolve, reject) => {
     timer = setTimeout(async () => {
       try {
-        if (param === "") {
+        if (!param) {
           resolve([]);
           return;
         }
