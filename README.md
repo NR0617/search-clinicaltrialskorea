@@ -9,11 +9,11 @@
 3. 200밀리초 동안 getSickData함수의 호출이 없으면 마지막으로 생성된 timer만 실행된다.
 
 ```js
-const GETSICK = "/sick?q=";
+const GETSICK = '/sick?q=';
 
 let timer;
 
-const getSickData = (param = "") => {
+const getSickData = (param = '') => {
   if (timer) {
     clearTimeout(timer);
   }
@@ -21,7 +21,7 @@ const getSickData = (param = "") => {
   return new Promise((resolve, reject) => {
     timer = setTimeout(async () => {
       try {
-        if (param === "") {
+        if (param === '') {
           resolve([]);
           return;
         }
@@ -49,26 +49,24 @@ const getSickData = (param = "") => {
 ```js
 instance.interceptors.request.use(
   async function (config) {
-    const result = await caches
-      .match(config.url)
-      .then((response) => response && response.json());
+    const result = await caches.match(config.url).then(response => response && response.json());
 
     if (!!result) {
       if (isValid(result.headers.created_date)) {
         return Promise.reject(result);
       }
-      const cacheStorage = await caches.open("search");
+      const cacheStorage = await caches.open('search');
       await cacheStorage.delete(config.url);
     }
     return config;
   },
   function (error) {
     return Promise.reject(error);
-  }
+  },
 );
 
 // ./src/api/isValid
-const isValid = (createdAt) => {
+const isValid = createdAt => {
   const expireTime = 86400000;
   const currentTime = Date.now();
   return currentTime - createdAt < expireTime;
@@ -83,9 +81,9 @@ instance.interceptors.response.use(
   async function (config) {
     if (config.data.length !== 0) {
       config.headers.created_date = Date.now();
-      const cacheStorage = await caches.open("search");
+      const cacheStorage = await caches.open('search');
       const headers = new Headers();
-      headers.append("Content-Type", "application/json;charset=utf-8");
+      headers.append('Content-Type', 'application/json;charset=utf-8');
       const cacheResponse = new Response(JSON.stringify(config), {
         headers: headers,
       });
@@ -97,7 +95,7 @@ instance.interceptors.response.use(
   },
   function (error) {
     return Promise.reject(error);
-  }
+  },
 );
 ```
 

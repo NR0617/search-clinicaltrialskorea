@@ -1,10 +1,10 @@
-import axiosInstance from "./axiosInstance";
+import axiosInstance from './axiosInstance';
 
-const GETSICK = "/sick?q=";
+const GETSICK = '/sick?q=';
 
 let timer;
 
-const getSickData = (param) => {
+const getSickData = param => {
   if (timer) {
     clearTimeout(timer);
   }

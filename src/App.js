@@ -1,55 +1,55 @@
-import { useEffect, useState, useRef } from "react";
-import { getSickData } from "./api/api";
-import styled from "styled-components";
-import { BiSearchAlt2 as Icon } from "react-icons/bi";
-import "./App.css";
+import { useEffect, useState, useRef } from 'react';
+import { getSickData } from './api/api';
+import styled from 'styled-components';
+import { BiSearchAlt2 as Icon } from 'react-icons/bi';
+import './App.css';
 
 function App() {
   const inputRef = useRef();
   const listRef = useRef();
   const [index, setIndex] = useState(-1);
 
-  const keyDownScrollIndex = (e) => {
+  const keyDownScrollIndex = e => {
     const listNode = listRef.current;
-    const itemNode = listNode?.querySelectorAll("ul > li");
-    if (e.key === "ArrowDown") {
+    const itemNode = listNode?.querySelectorAll('ul > li');
+    if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setIndex((prev) => (prev < itemNode?.length - 1 ? prev + 1 : prev));
-      itemNode && itemNode[index - 1]?.classList.remove("selected");
-      itemNode && itemNode[index]?.classList.add("selected");
-    } else if (e.key === "ArrowUp") {
+      setIndex(prev => (prev < itemNode?.length - 1 ? prev + 1 : prev));
+      itemNode && itemNode[index - 1]?.classList.remove('selected');
+      itemNode && itemNode[index]?.classList.add('selected');
+    } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setIndex((prev) => (prev > 1 ? prev - 1 : prev));
-      itemNode && itemNode[index]?.classList.remove("selected");
-      itemNode && itemNode[index - 1]?.classList.add("selected");
+      setIndex(prev => (prev > 1 ? prev - 1 : prev));
+      itemNode && itemNode[index]?.classList.remove('selected');
+      itemNode && itemNode[index - 1]?.classList.add('selected');
     } else {
       inputRef.current.focus();
     }
   };
 
-  const [searchWord, setSearchWord] = useState("");
+  const [searchWord, setSearchWord] = useState('');
   const [searchResult, setSearchResult] = useState([]);
 
   useEffect(() => {
     const query = searchWord.trim();
     if (!query) return;
     getSickData(query)
-      .then(async (result) => {
+      .then(async result => {
         setSearchResult(result);
         setIndex(-1);
         const listNode = listRef.current;
-        const itemNode = listNode?.getElementsByClassName("selected");
+        const itemNode = listNode?.getElementsByClassName('selected');
         itemNode &&
-          Array.from(itemNode).forEach((element) => {
-            element.classList.remove("selected");
+          Array.from(itemNode).forEach(element => {
+            element.classList.remove('selected');
           });
       })
-      .catch((err) => {
-        console.log(err);
+      .catch(err => {
+        console.error(err);
       });
   }, [searchWord]);
 
-  const changeSearchWord = (e) => {
+  const changeSearchWord = e => {
     setSearchWord(e.target.value);
   };
 
@@ -77,13 +77,13 @@ function App() {
             </li>
             <p>추천검색어</p>
             {searchResult.map(
-              (el) =>
+              el =>
                 el.sickNm !== searchWord && (
                   <li key={el.sickCd}>
                     <Icon size="25px" />
                     {el.sickNm}
                   </li>
-                )
+                ),
             )}
           </SearchResultContainer>
         ) : (
