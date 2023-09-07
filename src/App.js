@@ -1,17 +1,46 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { getSickData } from "./api/api";
 import styled from "styled-components";
-import { BiSearchAlt2 } from "react-icons/bi";
+import { BiSearchAlt2 as Icon } from "react-icons/bi";
 import "./App.css";
 
 function App() {
+  const inputRef = useRef();
+  const listRef = useRef(null);
+  const [index, setIndex] = useState(-1);
+
+  const scrollToIndex = (e) => {
+    const listNode = listRef.current;
+    const itemNode = listNode?.querySelectorAll("ul > li");
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      itemNode && itemNode[index - 1]?.classList.remove("selected");
+      itemNode && itemNode[index]?.classList.add("selected");
+      setIndex((prev) => (prev < itemNode?.length - 1 ? prev + 1 : prev));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      itemNode && itemNode[index]?.classList.remove("selected");
+      itemNode && itemNode[index - 1]?.classList.add("selected");
+      setIndex((prev) => (prev > 0 ? prev - 1 : prev));
+    } else {
+      inputRef.current.focus();
+    }
+  };
+
   const [searchWord, setSearchWord] = useState("");
   const [searchResult, setSearchResult] = useState([]);
 
   useEffect(() => {
-    getSickData(searchWord)
+    getSickData(searchWord.trim())
       .then(async (result) => {
         setSearchResult(result);
+        setIndex(-1);
+        const listNode = listRef.current;
+        const itemNode = listNode?.getElementsByClassName("selected");
+        Array.from(itemNode).forEach((element) => {
+          element.classList.remove("selected");
+        });
+        console.log(itemNode, listRef.current);
       })
       .catch((err) => {
         console.log(err);
@@ -19,7 +48,7 @@ function App() {
   }, [searchWord]);
 
   const changeSearchWord = (e) => {
-    setSearchWord(e.target.value.trim());
+    setSearchWord(e.target.value);
   };
 
   return (
@@ -27,8 +56,10 @@ function App() {
       <Title>국내 모든 임상시험 검색하고</Title>
       <Title>온라인으로 참여하기</Title>
       <SearchInputWrapper>
-        <BiSearchAlt2 size="25px" />
+        <Icon size="25px" />
         <SearchWordInput
+          onKeyUp={scrollToIndex}
+          ref={inputRef}
           value={searchWord}
           onChange={changeSearchWord}
           placeholder="질환명을 입력해주세요"
@@ -37,23 +68,21 @@ function App() {
 
       {searchWord.length !== 0 &&
         (searchResult.length !== 0 ? (
-          <SearchResultContainer>
-            <p>
-              <BiSearchAlt2 size="25px" />
+          <SearchResultContainer ref={listRef}>
+            <li>
+              <Icon size="25px" />
               {searchWord}
-            </p>
+            </li>
             <p>추천검색어</p>
-            {searchResult.map((el) => {
-              if (el.sickNm !== searchWord) {
-                return (
-                  <div key={el.sickCd} name="serchedItems">
-                    <BiSearchAlt2 size="25px" />
+            {searchResult.map(
+              (el) =>
+                el.sickNm !== searchWord && (
+                  <li key={el.sickCd}>
+                    <Icon size="25px" />
                     {el.sickNm}
-                  </div>
-                );
-              }
-              return null;
-            })}
+                  </li>
+                )
+            )}
           </SearchResultContainer>
         ) : (
           <SearchResultContainer>검색어 없음</SearchResultContainer>
@@ -72,6 +101,7 @@ const PageWrapper = styled.div`
   width: 100%;
   height: 100vh;
   background-color: #cae9ff;
+  overflow: auto;
 `;
 
 const Title = styled.p`
@@ -106,7 +136,7 @@ const SearchWordInput = styled.input`
     outline: none;
   }
 `;
-const SearchResultContainer = styled.div`
+const SearchResultContainer = styled.ul`
   border-width: 2px;
   border-radius: 10px;
   width: 650px;
