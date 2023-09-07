@@ -15,10 +15,10 @@ instance.interceptors.request.use(
       if (isValid(result.headers.created_date)) {
         return Promise.reject(result);
       }
-      const cacheStorage = await caches.open("test");
+      const cacheStorage = await caches.open("search");
       await cacheStorage.delete(config.url);
     }
-    console.log("api요청");
+    console.log("api call");
     return config;
   },
   function (error) {
@@ -30,9 +30,9 @@ instance.interceptors.response.use(
   async function (config) {
     if (config.data.length !== 0) {
       config.headers.created_date = Date.now();
+      const cacheStorage = await caches.open("search");
       const headers = new Headers();
       headers.append("Content-Type", "application/json;charset=utf-8");
-      const cacheStorage = await caches.open("test");
       const cacheResponse = new Response(JSON.stringify(config), {
         headers: headers,
       });
