@@ -5,14 +5,14 @@ const GETSICK = '/sick?q=';
 let timer;
 
 const getSickData = param => {
-  if (timer) {
-    clearTimeout(timer);
-  }
   return new Promise((resolve, reject) => {
+    if (timer) {
+      clearTimeout(timer);
+    }
     timer = setTimeout(async () => {
       try {
         if (!param) {
-          resolve([]);
+          resolve(null);
           return;
         }
         const response = await axiosInstance.get(GETSICK + param);

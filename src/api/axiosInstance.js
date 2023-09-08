@@ -30,15 +30,9 @@ instance.interceptors.response.use(
     if (config.data.length !== 0) {
       config.headers.created_date = Date.now();
       const cacheStorage = await caches.open('search');
-      const headers = new Headers();
-      headers.append('Content-Type', 'application/json;charset=utf-8');
-      const cacheResponse = new Response(JSON.stringify(config), {
-        headers: headers,
-      });
-
+      const cacheResponse = new Response(JSON.stringify(config));
       await cacheStorage.put(config.config.url, cacheResponse);
     }
-
     return config;
   },
   function (error) {
