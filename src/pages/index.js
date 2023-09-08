@@ -1,65 +1,40 @@
-import { useEffect, useState, useRef } from 'react';
-import { getSickData } from '../api/api';
+import { useRef } from 'react';
+import useSearch from '../hooks/useSearch';
 import styled from 'styled-components';
 import { BiSearchAlt2 as Icon } from 'react-icons/bi';
-// import SearchResult from '../components/SearchResult';
 import ListItemComponent from '../components/ListItem';
 
 function Main() {
   const inputRef = useRef();
   const listRef = useRef();
-  const [index, setIndex] = useState(0);
 
-  const keyDownScrollIndex = e => {
-    const listNode = listRef.current;
-    const itemNode = listNode?.querySelectorAll('ul > li');
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setIndex(prev => (prev < itemNode?.length - 1 ? prev + 1 : prev));
-      itemNode && itemNode[index - 1]?.classList.remove('selected');
-      itemNode && itemNode[index]?.classList.add('selected');
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setIndex(prev => (prev > 1 ? prev - 1 : 0));
-      itemNode && itemNode[index]?.classList.remove('selected');
-      itemNode && itemNode[index - 1]?.classList.add('selected');
-    } else if (e.key === 'Enter') {
-      console.info(document.getElementsByClassName('selected')[0].textContent);
-      setSearchWord(document.getElementsByClassName('selected')[0].textContent);
-      inputRef.current.value = document.getElementsByClassName('selected')[0].textContent;
-    } else {
-      inputRef.current.focus();
-    }
-  };
-
-  const [searchWord, setSearchWord] = useState('');
-  const [searchResult, setSearchResult] = useState([]);
-  const INITIAL_INDEX = -1;
-
-  useEffect(() => {
-    const query = searchWord.trim();
-
-    getSickData(query)
-      .then(async result => {
-        result && setSearchResult(result.slice(0, 10));
-        setIndex(INITIAL_INDEX);
-        const listNode = listRef.current;
-        const itemNode = listNode?.getElementsByClassName('selected');
-        itemNode &&
-          Array.from(itemNode).forEach(element => {
-            element.classList.remove('selected');
-          });
-      })
-      .catch(err => {
-        console.error(err);
-      });
-  }, [searchWord, INITIAL_INDEX]);
-
+  const { searchWord, setSearchWord, searchResult, nodeIndex, setNodeIndex } = useSearch(listRef);
   const changeSearchWord = e => {
     setSearchWord(e.target.value);
   };
 
+  const handlekeyDown = e => {
+    const listNode = listRef?.current;
+    const itemNode = listNode?.querySelectorAll('ul > li');
+    if (e?.key === 'ArrowDown') {
+      e.preventDefault();
+      setNodeIndex(prev => (prev < itemNode?.length - 1 ? prev + 1 : prev));
+      itemNode && itemNode[nodeIndex - 1]?.classList.remove('selected');
+      itemNode && itemNode[nodeIndex]?.classList.add('selected');
+    } else if (e?.key === 'ArrowUp') {
+      e.preventDefault();
+      setNodeIndex(prev => (prev > 1 ? prev - 1 : 0));
+      itemNode && itemNode[nodeIndex]?.classList.remove('selected');
+      itemNode && itemNode[nodeIndex - 1]?.classList.add('selected');
+    } else if (e?.key === 'Enter') {
+      setSearchWord(document.getElementsByClassName('selected')[0].textContent);
+    } else {
+      inputRef?.current.focus();
+    }
+  };
+
   const FIRST_INDEX = 1;
+
   return (
     <PageWrapper>
       <Title>국내 모든 임상시험 검색하고</Title>
@@ -67,7 +42,7 @@ function Main() {
       <SearchInputWrapper>
         <Icon size="20px" />
         <SearchWordInput
-          onKeyDown={keyDownScrollIndex}
+          onKeyDown={handlekeyDown}
           ref={inputRef}
           value={searchWord}
           onChange={changeSearchWord}

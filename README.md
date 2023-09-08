@@ -106,27 +106,29 @@ instance.interceptors.response.use(
 3. 데이터를 요청해서 ul 리스트가 변경되면 모든 "selected" 클래스를 제거하여 초기화한다.
 
 ```js
-const inputRef = useRef();
-const listRef = useRef();
-const [index, setIndex] = useState(-1);
+  const inputRef = useRef();
+  const listRef = useRef();
+  const [index, setIndex] = useState(0);
 
-const keyDownScrollIndex = (e) => {
-const listNode = listRef.current;
-const itemNode = listNode?.querySelectorAll("ul > li");
-if (e.key === "ArrowDown") {
-  e.preventDefault();
-  setIndex((prev) => (prev < itemNode?.length - 1 ? prev + 1 : prev));
-  itemNode && itemNode[index - 1]?.classList.remove("selected");
-  itemNode && itemNode[index]?.classList.add("selected");
-} else if (e.key === "ArrowUp") {
-  e.preventDefault();
-  setIndex((prev) => (prev > 1 ? prev - 1 : prev));
-  itemNode && itemNode[index]?.classList.remove("selected");
-  itemNode && itemNode[index - 1]?.classList.add("selected");
-} else {
-  inputRef.current.focus();
-}
-};
+  const keyDownScrollIndex = e => {
+    const listNode = listRef.current;
+    const itemNode = listNode?.querySelectorAll('ul > li');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setIndex(prev => (prev < itemNode?.length - 1 ? prev + 1 : prev));
+      itemNode && itemNode[index - 1]?.classList.remove('selected');
+      itemNode && itemNode[index]?.classList.add('selected');
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setIndex(prev => (prev > 1 ? prev - 1 : 0));
+      itemNode && itemNode[index]?.classList.remove('selected');
+      itemNode && itemNode[index - 1]?.classList.add('selected');
+    } else if (e.key === 'Enter') {
+      setSearchWord(document.getElementsByClassName('selected')[0].textContent);
+    } else {
+      inputRef.current.focus();
+    }
+  };
 
 useEffect(() => {
   getSickData(query)
