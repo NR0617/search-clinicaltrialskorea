@@ -58,7 +58,7 @@ function App() {
       <Title>국내 모든 임상시험 검색하고</Title>
       <Title>온라인으로 참여하기</Title>
       <SearchInputWrapper>
-        <Icon size="25px" />
+        <Icon size="20px" />
         <SearchWordInput
           onKeyDown={keyDownScrollIndex}
           ref={inputRef}
@@ -71,18 +71,18 @@ function App() {
       {searchWord.length !== 0 &&
         (searchResult.length !== 0 ? (
           <SearchResultContainer ref={listRef}>
-            <li>
-              <Icon size="25px" />
-              {searchWord}
-            </li>
+            <ListItem>
+              <Icon size="20px" />
+              <p>{searchWord}</p>
+            </ListItem>
             <p>추천검색어</p>
             {searchResult.map(
               el =>
                 el.sickNm !== searchWord && (
-                  <li key={el.sickCd}>
-                    <Icon size="25px" />
-                    {el.sickNm}
-                  </li>
+                  <ListItem key={el.sickCd}>
+                    <Icon size="20px" />
+                    <p>{el.sickNm}</p>
+                  </ListItem>
                 ),
             )}
           </SearchResultContainer>
@@ -116,7 +116,6 @@ const SearchInputWrapper = styled.div`
   margin-top: 20px;
   width: 650px;
   height: fit-content;
-  /* 여기 */
   background-color: white;
   border-radius: 40px;
   display: flex;
@@ -153,4 +152,8 @@ const SearchResultContainer = styled.ul`
   line-height: 160%;
   background-color: white;
   overflow: auto;
+`;
+
+const ListItem = styled.li`
+  display: flex;
 `;

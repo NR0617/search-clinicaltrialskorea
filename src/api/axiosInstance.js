@@ -2,7 +2,7 @@ import axios from 'axios';
 import isValid from './validation';
 const instance = axios.create({
   baseURL: process.env.REACT_APP_SERVER_URL,
-  timeout: 5000,
+  timeout: 20000,
 });
 
 instance.interceptors.request.use(
